@@ -1,9 +1,12 @@
 clc
 clear all
 close all
+% Anomaly detection in video using optical flow (Lucas-Kanade), a social
+% force model, and Particle Swarm Optimization. The UM dataset (umn.avi)
+% must be in the same folder as this script.
 videoFReader = vision.VideoFileReader('umndataset.avi');
 
-vidReader = VideoReader('D:\bin\Vision\umndataset.avi');
+vidReader = VideoReader('umndataset.avi');
 opticFlow = opticalFlowLK('NoiseThreshold',0.0035);%initializing OF using Lucas kande
 a=vidReader.NumberOfFrames;%Commputing Number of frames
 oavgxy=zeros(120,160,a,2);%initializing OFXy avg
@@ -47,7 +50,6 @@ gbest=[89 40];
 vinew=vinew(:,1:2);
 fintpbest=zeros(100);
 fintpbest=fintpbest(:,1:2);
-bestfit=15;
 c1=0.1;
 c2=0.2;
 fintxy=zeros(100,2,306);
@@ -85,11 +87,11 @@ for i=1:100%j is the row
     else
         fintpbest(i,2)=10*(oindividualxy(pbest(i,2),pbest(i,1),frmno,2)-oindividualxy(pbest(i,2),pbest(i,1),(frmno-1),2))-5*(oindividualxy(pbest(i,2),pbest(i,1),frmno,2)-oavgxy(pbest(i,2),pbest(i,1),frmno,2));
      end
-          %%%%fint(pbest is calculated)
-          %%comparison of fint(xnew) and fint (pbest)
-          if( fintxy(i,:,frmno)<fintpbest(i,:))
-              pbest(i,:)=abs(round(post(i,:)));
-          end
+           %%%%fint(pbest is calculated)
+           %%comparison of fint(xnew) and fint (pbest)
+           if sum(fintxy(i,:,frmno)) < sum(fintpbest(i,:))
+               pbest(i,:)=abs(round(post(i,:)));
+           end
           
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -109,7 +111,7 @@ for i=1:100
 
 end
 vinew=vinew+c1*rand(1)*(pbest-post)+c2*rand(1)*([gbest(1)-post(:,1) gbest(2)-post(:,2)]);
-for j=1:100
+for i=1:100
 post(i,1)=abs(round(post(i,1)+vinew(i,1)));
 post(i,2)=abs(round(post(i,2)+vinew(i,2)));
 if(post(i,1)==0 || post(i,1)>160)
@@ -181,4 +183,5 @@ box_color = {'Yellow'};
 RGB = insertText(I,position,text_str,'FontSize',14,'BoxColor',box_color,'BoxOpacity',0.4);
 end
 imshow(RGB)
+drawnow
 end

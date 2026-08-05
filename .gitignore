@@ -1,0 +1,9 @@
+# MATLAB
+*.asv
+*.m~
+*.mlappinstall
+*.mex*
+
+# OS
+.DS_Store
+Thumbs.db
